@@ -9,6 +9,7 @@ class ClockPainter extends CustomPainter {
 
   double? disabledStartAngle;
   double? disabledEndAngle;
+
   ActiveTime? activeTime;
 
   double radius;
@@ -31,6 +32,8 @@ class ClockPainter extends CustomPainter {
   double ticksLength;
   double ticksWidth;
   Color ticksColor;
+  List<TimeRange> disabledRange;
+  List<Color> disabledListedColor;
   List<ClockLabel> labels;
   TextStyle? labelStyle;
   double labelOffset;
@@ -66,6 +69,8 @@ class ClockPainter extends CustomPainter {
     required this.ticksLength,
     required this.ticksWidth,
     required this.ticksColor,
+    required this.disabledRange,
+    required this.disabledListedColor,
     required this.labels,
     this.labelStyle,
     required this.labelOffset,
@@ -95,6 +100,30 @@ class ClockPainter extends CustomPainter {
 
       canvas.drawArc(
           rect, start, sweep, paintingStyle == PaintingStyle.fill, paint);
+
+      // List<Color> colorrr=[Color(Random().nextInt(0xffffffff)).withAlpha(0xff)];
+      // disabledRange.forEach((element) {
+      //   colorrr.add(Color(Random().nextInt(0xffffffff)).withAlpha(0xff));
+      // });
+
+      int i=0;
+      disabledRange.forEach((range) {
+        paint.color = disabledListedColor.elementAt(i);
+         i++;
+        var _startAngle1 = normalizeAngle(timeToAngle(range.startTime, 0));
+        var _endAngle1 = normalizeAngle(timeToAngle(range.endTime, 0));
+        var sweep12 = calcSweepAngle(_startAngle1, _endAngle1);
+        canvas.drawArc(
+            rect, _startAngle1, sweep12, paintingStyle == PaintingStyle.fill, paint);
+      });
+
+      // /// important
+      // var _startAngle = normalizeAngle(timeToAngle(TimeOfDay(hour: 10, minute: 0), 0));
+      // var _endAngle = normalizeAngle(timeToAngle(TimeOfDay(hour: 12, minute: 0), 0));
+      // var sweep1 = calcSweepAngle(_startAngle, _endAngle);
+      // canvas.drawArc(
+      //     rect, _startAngle, sweep1, paintingStyle == PaintingStyle.fill, paint);
+
     }
 
     drawTicks(
@@ -146,9 +175,9 @@ class ClockPainter extends CustomPainter {
   }
 
   void drawTicks(
-    Paint paint,
-    Canvas canvas,
-  ) {
+      Paint paint,
+      Canvas canvas,
+      ) {
     var r = radius + ticksOffset - strokeWidth / 2;
     paint.color = ticksColor;
     paint.strokeWidth = ticksWidth;
@@ -160,9 +189,9 @@ class ClockPainter extends CustomPainter {
   }
 
   void drawLabels(
-    Paint paint,
-    Canvas canvas,
-  ) {
+      Paint paint,
+      Canvas canvas,
+      ) {
     labels.forEach((label) {
       drawText(
           canvas,
@@ -189,7 +218,7 @@ class ClockPainter extends CustomPainter {
     );
     _textPainter.layout();
     Offset drawCenter =
-        Offset(-(_textPainter.width / 2), -(_textPainter.height / 2));
+    Offset(-(_textPainter.width / 2), -(_textPainter.height / 2));
 
     if (rotateLabels) {
       bool flipLabel = false;
